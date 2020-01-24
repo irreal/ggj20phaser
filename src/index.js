@@ -1,5 +1,7 @@
 import Phaser from "phaser";
-import logoImg from "./assets/logo.png";
+import buttonImg from "./assets/button.png";
+
+const serverUrl = 'http://localhost:3000/';
 
 const config = {
   type: Phaser.AUTO,
@@ -15,22 +17,34 @@ const config = {
 const game = new Phaser.Game(config);
 
 function preload() {
-  this.load.image("logo", logoImg);
+  this.load.image("button", buttonImg);
 }
 
 function create() {
-  const logo = this.add.image(400, 150, "logo");
+  const button = this.add.image(400, 150, "button");
+  button.setInteractive();
 
-  this.tweens.add({
-    targets: logo,
-    y: 450,
-    duration: 2000,
-    ease: "Power2",
-    yoyo: true,
-    loop: -1
+  this.input.on('gameobjectdown', (pointer, gameObject) => {
+    if (gameObject === button) {
+      fetch(serverUrl + 'event', {
+        method: 'post',
+        body: JSON.stringify({ action: 'create' })
+      })
+    }
   });
 
-  window.fetch("http://localhost:3000").then(response => response.json()).then(data => {
+
+
+  // this.tweens.add({
+  //   targets: logo,
+  //   y: 450,
+  //   duration: 2000,
+  //   ease: "Power2",
+  //   yoyo: true,
+  //   loop: -1
+  // });
+
+  window.fetch(serverUrl).then(response => response.json()).then(data => {
     console.log('Server kaže: ' + data.message, data);
   });
 }
