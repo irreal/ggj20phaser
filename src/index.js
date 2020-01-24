@@ -28,6 +28,9 @@ function create() {
     if (gameObject === button) {
       fetch(serverUrl + 'event', {
         method: 'post',
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({ action: 'create' })
       })
     }
