@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import buttonImg from "./assets/button.png";
 
-const serverUrl = 'http://localhost:3000/';
+const serverUrl = 'https://118db686.ngrok.io/';
 
 const config = {
   type: Phaser.AUTO,
