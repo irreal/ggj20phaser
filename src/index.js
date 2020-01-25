@@ -1,7 +1,8 @@
 import Phaser from "phaser";
 import buttonImg from "./assets/button.png";
+import configuration from "./assets/configuration/configuration";
 
-const serverUrl = 'https://ggj20.azurewebsites.net/';
+const serverUrl = configuration.apiUrl;
 
 const config = {
   type: Phaser.AUTO,

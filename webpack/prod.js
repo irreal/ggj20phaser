@@ -1,4 +1,5 @@
 const merge = require("webpack-merge");
+const webpack = require("webpack");
 const path = require("path");
 const base = require("./base");
 const TerserPlugin = require("terser-webpack-plugin");
@@ -23,5 +24,11 @@ module.exports = merge(base, {
         }
       })
     ]
-  }
+  },
+  plugins: [
+    new webpack.NormalModuleReplacementPlugin(
+      /src.*configuration\.js/,
+      "./configuration.prod.js"
+    ),
+  ]
 });
