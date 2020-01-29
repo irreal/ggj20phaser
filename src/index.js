@@ -27,6 +27,30 @@ function preload() {
 
 var squares = [];
 var currentMode = '';
+var actionLog = [];
+var lastTimestamp = new Date().getTime();
+
+
+var squareClick = function (object, mode, actionLog, lastTimeStamp) {
+  if (object.texture.key == 'blacksquare' && mode == 'white') {
+    object.setTexture('whitesquare');
+    logAction(object, mode, actionLog, lastTimeStamp);
+  }
+  else if (object.texture.key == 'whitesquare' && mode == 'black') {
+    object.setTexture('blacksquare');
+    logAction(object, mode, actionLog, lastTimeStamp);
+  }
+}
+
+var logAction = function (object, mode, log, stamp) {
+  var newTime = new Date().getTime();
+  var timeDiff = newTime - stamp;
+  if (timeDiff > 1000) {
+    timeDiff = 1000;
+  }
+  log.push({ x: object.tagX, y: object.tagY, action: mode == "black" ? 1 : 0, delay: timeDiff });
+}
+
 function create() {
 
   this.cameras.main.setBackgroundColor('#FFFFFF')
@@ -39,6 +63,8 @@ function create() {
     squares.push([]);
     for (var u = 0; u < 17; u++) {
       const img = this.add.image(30 + u * 51, 100 + i * 51, "whitesquare");
+      img.tagX = u;
+      img.tagY = i;
       img.setInteractive();
       squares[i].push(img);
 
@@ -47,28 +73,26 @@ function create() {
 
   this.input.on('gameobjectdown', (pointer, gameObject) => {
     if (gameObject === button) {
-      var data = [...squares].map(arr => {
-        return arr.map(i => i.texture.key == 'blacksquare' ? 1 : 0);
-      }
-      );
-      console.log('here is the data', data);
+      console.log('alog', actionLog);
       fetch(serverUrl + 'event', {
         method: 'post',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ action: 'img', data })
-      })
+        body: JSON.stringify({ action: 'img', actionLog })
+      }).finally(() => {
+        squares.forEach(row => {
+          row.forEach(s => {
+            s.setTexture('whitesquare');
+          });
+        });
+        actionLog = [];
+      });
     }
     else {
-      if (gameObject.texture.key == 'blacksquare') {
-        currentMode = 'white';
-        gameObject.setTexture('whitesquare');
-      }
-      else {
-        gameObject.setTexture('blacksquare');
-        currentMode = 'black';
-      }
+      currentMode = gameObject.texture.key == 'whitesquare' ? 'black' : 'white';
+      squareClick(gameObject, currentMode, actionLog, lastTimestamp);
+      lastTimestamp = new Date().getTime();
     }
   });
   this.input.on('gameobjectup', () => {
@@ -79,26 +103,7 @@ function create() {
     if (!currentMode) {
       return;
     }
-    if (gameObject.texture.key == 'blacksquare' && currentMode == 'white') {
-      gameObject.setTexture('whitesquare');
-    }
-    else if (gameObject.texture.key == 'whitesquare' && currentMode == 'black') {
-      gameObject.setTexture('blacksquare');
-    }
-  });
-
-
-
-  // this.tweens.add({
-  //   targets: logo,
-  //   y: 450,
-  //   duration: 2000,
-  //   ease: "Power2",
-  //   yoyo: true,
-  //   loop: -1
-  // });
-
-  window.fetch(serverUrl).then(response => response.json()).then(data => {
-    console.log('Server kaže: ' + data.message, data);
+    squareClick(gameObject, currentMode, actionLog, lastTimestamp);
+    lastTimestamp = new Date().getTime();
   });
 }
