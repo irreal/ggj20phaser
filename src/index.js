@@ -1,68 +1,42 @@
 import Phaser from "phaser";
-import buttonImg from "./assets/button.png";
-import blackSquareImg from "./assets/blacksquare.png";
-import whiteSquareImg from "./assets/whitesquare.png";
 import configuration from "./assets/configuration/configuration";
+import preload from "./preload";
+import squareClick from "./squareClick";
 
 const serverUrl = configuration.apiUrl;
 
-const config = {
-  type: Phaser.AUTO,
-  parent: "phaser-example",
-  width: 1400,
-  height: 700,
+const phaserConfig = {
+  ...configuration.phaserConfig,
   scene: {
-    preload: preload,
+    preload,
     create: create
   }
 };
 
-const game = new Phaser.Game(config);
+const game = new Phaser.Game(phaserConfig);
 
-function preload() {
-  this.load.image("button", buttonImg);
-  this.load.image("blacksquare", blackSquareImg);
-  this.load.image("whitesquare", whiteSquareImg);
-}
 
+//global state
 var squares = [];
 var currentMode = '';
 var actionLog = [];
 var lastTimestamp = new Date().getTime();
 
-
-var squareClick = function (object, mode, actionLog, lastTimeStamp) {
-  if (object.texture.key == 'blacksquare' && mode == 'white') {
-    object.setTexture('whitesquare');
-    logAction(object, mode, actionLog, lastTimeStamp);
-  }
-  else if (object.texture.key == 'whitesquare' && mode == 'black') {
-    object.setTexture('blacksquare');
-    logAction(object, mode, actionLog, lastTimeStamp);
-  }
-}
-
-var logAction = function (object, mode, log, stamp) {
-  var newTime = new Date().getTime();
-  var timeDiff = newTime - stamp;
-  if (timeDiff > 1000) {
-    timeDiff = 1000;
-  }
-  log.push({ x: object.tagX, y: object.tagY, action: mode == "black" ? 1 : 0, delay: timeDiff });
-}
-
 function create() {
+  createUI(this);
+}
 
-  this.cameras.main.setBackgroundColor('#FFFFFF')
+var createUI = function (scene) {
+  scene.cameras.main.setBackgroundColor('#FFFFFF')
 
-  const button = this.add.image(400, 50, "button");
+  const button = scene.add.image(400, 50, "button");
   button.setInteractive();
 
 
   for (var i = 0; i < 12; i++) {
     squares.push([]);
     for (var u = 0; u < 17; u++) {
-      const img = this.add.image(30 + u * 51, 100 + i * 51, "whitesquare");
+      const img = scene.add.image(30 + u * 51, 100 + i * 51, "whitesquare");
       img.tagX = u;
       img.tagY = i;
       img.setInteractive();
@@ -71,9 +45,8 @@ function create() {
     }
   }
 
-  this.input.on('gameobjectdown', (pointer, gameObject) => {
+  scene.input.on('gameobjectdown', (pointer, gameObject) => {
     if (gameObject === button) {
-      console.log('alog', actionLog);
       fetch(serverUrl + 'event', {
         method: 'post',
         headers: {
@@ -95,11 +68,11 @@ function create() {
       lastTimestamp = new Date().getTime();
     }
   });
-  this.input.on('gameobjectup', () => {
+  scene.input.on('gameobjectup', () => {
     currentMode = '';
   });
 
-  this.input.on('gameobjectover', (pointer, gameObject) => {
+  scene.input.on('gameobjectover', (pointer, gameObject) => {
     if (!currentMode) {
       return;
     }
@@ -107,3 +80,5 @@ function create() {
     lastTimestamp = new Date().getTime();
   });
 }
+
+
