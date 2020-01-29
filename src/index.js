@@ -21,12 +21,16 @@ var squares = [];
 var currentMode = '';
 var actionLog = [];
 var lastTimestamp = new Date().getTime();
+console.log('Running GGJ20 Phaser frontend version: ', VERSION);
 
 function create() {
   createUI(this);
 }
 
 var createUI = function (scene) {
+
+  const text = scene.add.text(0, 0, `v: ${VERSION}`, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif' });
+  text.setColor('black');
   scene.cameras.main.setBackgroundColor('#FFFFFF')
 
   const button = scene.add.image(400, 50, "button");

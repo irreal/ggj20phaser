@@ -3,6 +3,8 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
+var pjson = require('../package.json');
+
 module.exports = {
   mode: "development",
   devtool: "eval-source-map",
@@ -31,7 +33,8 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       CANVAS_RENDERER: JSON.stringify(true),
-      WEBGL_RENDERER: JSON.stringify(true)
+      WEBGL_RENDERER: JSON.stringify(true),
+      VERSION: JSON.stringify(pjson.version)
     }),
     new HtmlWebpackPlugin({
       template: "./index.html"
