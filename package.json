@@ -1,6 +1,6 @@
 {
   "name": "ggj20web",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A web frontend for our global game jame 2020 game!",
   "main": "src/index.js",
   "scripts": {
