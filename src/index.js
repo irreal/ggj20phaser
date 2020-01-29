@@ -26,6 +26,7 @@ function preload() {
 }
 
 var squares = [];
+var currentMode = '';
 function create() {
 
   this.cameras.main.setBackgroundColor('#FFFFFF')
@@ -61,11 +62,28 @@ function create() {
     }
     else {
       if (gameObject.texture.key == 'blacksquare') {
+        currentMode = 'white';
         gameObject.setTexture('whitesquare');
       }
       else {
         gameObject.setTexture('blacksquare');
+        currentMode = 'black';
       }
+    }
+  });
+  this.input.on('gameobjectup', () => {
+    currentMode = '';
+  });
+
+  this.input.on('gameobjectover', (pointer, gameObject) => {
+    if (!currentMode) {
+      return;
+    }
+    if (gameObject.texture.key == 'blacksquare' && currentMode == 'white') {
+      gameObject.setTexture('whitesquare');
+    }
+    else if (gameObject.texture.key == 'whitesquare' && currentMode == 'black') {
+      gameObject.setTexture('blacksquare');
     }
   });
 
