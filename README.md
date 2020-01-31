@@ -9,7 +9,7 @@ However, in order to serve this project to a web browser, it has to be processed
 
 First step after cloning the repository is to run `npm install` to get the dependencies.
 
-After that, running `npm run start` will start webpack in development mode, which means webpack will continuously compile code for you and reload the page when you make changes in source code
+After that, running `npm run dev` will start webpack in development mode, which means webpack will continuously compile code for you and reload the page when you make changes in source code
 
 When you are done with your changes, either bump the version manually in package.json or run `npm version minor`.
 
