@@ -29,6 +29,7 @@ function create() {
 
 function sendDrawing() {
   if (actionLog.length == 0) {
+    setTimeout(sendDrawing,100);
     return;
   }
   var data = [...actionLog];
@@ -40,8 +41,10 @@ function sendDrawing() {
     },
     body: JSON.stringify({ action: 'img', actionLog: data })
   });
+  setTimeout(sendDrawing,10);
 }
-setInterval(sendDrawing, 100);
+
+sendDrawing();
 
 var createUI = function (scene) {
 
@@ -67,7 +70,15 @@ var createUI = function (scene) {
 
   scene.input.on('gameobjectdown', (pointer, gameObject) => {
     if (gameObject === button) {
-      sendDrawing();
+      squares.forEach(row=> {row.forEach(s=> s.setTexture('whitesquare'))});
+      actionLog = [];
+      fetch(serverUrl + 'event', {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ action: 'clear-img'})
+      });
     }
     else {
       currentMode = gameObject.texture.key == 'whitesquare' ? 'black' : 'white';
