@@ -27,6 +27,22 @@ function create() {
   createUI(this);
 }
 
+function sendDrawing() {
+  if (actionLog.length == 0) {
+    return;
+  }
+  var data = [...actionLog];
+  actionLog = [];
+  fetch(serverUrl + 'event', {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ action: 'img', actionLog: data })
+  });
+}
+setInterval(sendDrawing, 100);
+
 var createUI = function (scene) {
 
   const text = scene.add.text(0, 0, `v: ${VERSION}`, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif' });
@@ -51,20 +67,7 @@ var createUI = function (scene) {
 
   scene.input.on('gameobjectdown', (pointer, gameObject) => {
     if (gameObject === button) {
-      fetch(serverUrl + 'event', {
-        method: 'post',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ action: 'img', actionLog })
-      }).finally(() => {
-        squares.forEach(row => {
-          row.forEach(s => {
-            s.setTexture('whitesquare');
-          });
-        });
-        actionLog = [];
-      });
+      sendDrawing();
     }
     else {
       currentMode = gameObject.texture.key == 'whitesquare' ? 'black' : 'white';
