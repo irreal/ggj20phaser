@@ -21,8 +21,8 @@ var squares = [];
 var currentMode = '';
 var actionLog = [];
 var lastTimestamp = new Date().getTime();
-const blockSize = 50;
-const borderSize = 1;
+const blockSize = 20;
+const borderSize = 0;
 const offsetX = 30;
 const offsetY = 100;
 
@@ -34,9 +34,9 @@ function create() {
 
 function sendDrawing() {
   if (actionLog.length == 0) {
-    setTimeout(sendDrawing, 100);
     return;
   }
+
   var data = [...actionLog];
   actionLog = [];
   fetch(serverUrl + 'event', {
@@ -46,7 +46,11 @@ function sendDrawing() {
     },
     body: JSON.stringify({ action: 'img', actionLog: data })
   });
-  setTimeout(sendDrawing, 10);
+}
+
+function clearDrawing() {
+  squares.forEach(row => { row.forEach(s => s.setTexture('whitesquare')) });
+  actionLog = [];
 }
 
 sendDrawing();
@@ -75,15 +79,8 @@ var createUI = function (scene) {
 
   scene.input.on('gameobjectdown', (pointer, gameObject) => {
     if (gameObject === button) {
-      squares.forEach(row => { row.forEach(s => s.setTexture('whitesquare')) });
-      actionLog = [];
-      fetch(serverUrl + 'event', {
-        method: 'post',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ action: 'clear-img' })
-      });
+      sendDrawing();
+      clearDrawing();
     }
     else {
       currentMode = gameObject.texture.key == 'whitesquare' ? 'black' : 'white';

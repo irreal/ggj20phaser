@@ -1,7 +1,7 @@
 export default {
     apiUrl: "https://ggj20.azurewebsites.net/",
-    drawBoardWidth: 17,
-    drawBoardHeight: 17,
+    drawBoardWidth: 50,
+    drawBoardHeight: 50,
     phaserConfig: {
         type: Phaser.AUTO,
         parent: "ggj20",
