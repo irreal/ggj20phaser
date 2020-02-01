@@ -6,8 +6,8 @@ export default {
     phaserConfig: {
         type: Phaser.AUTO,
         parent: "ggj20",
-        width: window.innerWidth,
-        height: window.innerHeight,
+        width: 1920,
+        height: 1080,
         pixelArt: true,
     }
 };
