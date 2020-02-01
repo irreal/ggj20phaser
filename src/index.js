@@ -21,17 +21,17 @@ var squares = [];
 var currentMode = '';
 var actionLog = [];
 var lastTimestamp = new Date().getTime();
-const blockSize = 20;
+const blockSize = 30;
 const borderSize = 0;
-const offsetX = 30;
-const offsetY = 100;
+const offsetX = 170;
+const offsetY = 50;
 
 console.log('Running GGJ20 Phaser frontend version: ', VERSION);
 
 function create() {
   createUI(this);
-  resizeApp();
-  window.addEventListener('resize', resizeApp);
+  // resizeApp();
+  // window.addEventListener('resize', resizeApp);
 }
 
 function sendDrawing() {
@@ -40,7 +40,7 @@ function sendDrawing() {
   }
 
   var data = [...actionLog];
-  actionLog = [];
+  // actionLog = [];
   fetch(serverUrl + 'event', {
     method: 'post',
     headers: {
@@ -51,26 +51,39 @@ function sendDrawing() {
 }
 
 function clearDrawing() {
-  squares.forEach(row => { row.forEach(s => s.setTexture('whitesquare')) });
+  squares.forEach(row => { row.forEach(s => s.setTexture('emptySquare')) });
   actionLog = [];
 }
 
-sendDrawing();
+
 
 var createUI = function (scene) {
 
-  const text = scene.add.text(0, 0, `v: ${VERSION}`, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif' });
-  text.setColor('black');
+  var canvas = scene.game.canvas;
   scene.cameras.main.setBackgroundColor('#FFFFFF')
 
-  const button = scene.add.image(400, 50, "button");
+  const background = scene.add.image((canvas.width /2) + 10,canvas.height / 2,"background");
+  background.setScale(1.0);
+
+
+  const message = scene.add.image(canvas.width / 2 - 100, canvas.height,"messageBox");
+  message.setOrigin(0.5,1);
+
+  const button = scene.add.image(1300, 970, "buttonUp");
   button.setInteractive();
+
+  const messageText = scene.add.text(400, 970, `v: ${VERSION}`, { fontFamily: 'Raleway' });
+  messageText.setOrigin(0,0.5);
+  messageText.setColor('black');
+  messageText.setFontSize(42);
+  messageText.text = "Please draw a shovel";
+
 
 
   for (var i = 0; i < configuration.drawBoardWidth; i++) {
     squares.push([]);
     for (var u = 0; u < configuration.drawBoardHeight; u++) {
-      const img = scene.add.image(offsetX + i * (blockSize + borderSize), offsetY + u * (blockSize + borderSize), "whitesquare");
+      const img = scene.add.image(offsetX + i * (blockSize + borderSize), offsetY + u * (blockSize + borderSize), "emptySquare");
       img.tagX = i;
       img.tagY = u;
       img.setInteractive();
@@ -79,13 +92,16 @@ var createUI = function (scene) {
     }
   }
 
+  const versionText = scene.add.text(0, 0, `v: ${VERSION}`, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif' });
+  versionText.setColor('black');
+
   scene.input.on('gameobjectdown', (pointer, gameObject) => {
     if (gameObject === button) {
       sendDrawing();
-      clearDrawing();
+      // clearDrawing();
     }
     else {
-      currentMode = gameObject.texture.key == 'whitesquare' ? 'black' : 'white';
+      currentMode = gameObject.texture.key == 'emptySquare' ? 'black' : 'white';
       squareClick(gameObject, currentMode, actionLog, lastTimestamp);
       lastTimestamp = new Date().getTime();
     }
@@ -108,16 +124,30 @@ var createUI = function (scene) {
 function resizeApp() {
   console.log('resizing app');
   // Width-height-ratio of game resolution
-  let game_ratio = 1024 / 768;
+  let game_ratio = 1920 / 1080;
   const xReduce = 0;
   const yReduce = 0;
 
-  // Make div full height of browser and keep the ratio of game resolution
-
   let div = document.getElementById('phaser-app');
-  div.style.width = (window.innerWidth - xReduce) + 'px';
-  div.style.height = (window.innerHeight - yReduce) + 'px';
-  
+  var height;
+  var width;
+  // if (window.innerWidth > window.innerHeight) {
+    height = window.innerHeight + "px";
+    width = Math.round((window.innerHeight * game_ratio)) + "px";
+  // }
+  // else {
+  //   width = window.innerWidth + "px";
+  //   height = Math.round((window.innerWidth / game_ratio)) + "px";
+  // }
+  // if (width > 1920 ) {
+  //   width = 1920;
+  // }
+  // if (height > 1080) {
+  //   height = 1080;
+  // }
+  div.style.width = width;
+  div.style.height = height;
+
   // let div = document.getElementById('phaser-app');
   // div.style.width = (window.innerHeight * game_ratio) + 'px';
   // div.style.height = window.innerHeight + 'px';

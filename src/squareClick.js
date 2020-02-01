@@ -1,11 +1,11 @@
 import logAction from "./logAction";
 export default function (object, mode, actionLog, lastTimeStamp) {
-    if (object.texture.key == 'blacksquare' && mode == 'white') {
-        object.setTexture('whitesquare');
+    if (object.texture.key == 'filledSquare' && mode == 'white') {
+        object.setTexture('emptySquare');
         logAction(object, mode, actionLog, lastTimeStamp);
     }
-    else if (object.texture.key == 'whitesquare' && mode == 'black') {
-        object.setTexture('blacksquare');
+    else if (object.texture.key == 'emptySquare' && mode == 'black') {
+        object.setTexture('filledSquare');
         logAction(object, mode, actionLog, lastTimeStamp);
     }
 }
