@@ -21,6 +21,11 @@ var squares = [];
 var currentMode = '';
 var actionLog = [];
 var lastTimestamp = new Date().getTime();
+const blockSize = 50;
+const borderSize = 1;
+const offsetX = 30;
+const offsetY = 100;
+
 console.log('Running GGJ20 Phaser frontend version: ', VERSION);
 
 function create() {
@@ -29,7 +34,7 @@ function create() {
 
 function sendDrawing() {
   if (actionLog.length == 0) {
-    setTimeout(sendDrawing,100);
+    setTimeout(sendDrawing, 100);
     return;
   }
   var data = [...actionLog];
@@ -41,7 +46,7 @@ function sendDrawing() {
     },
     body: JSON.stringify({ action: 'img', actionLog: data })
   });
-  setTimeout(sendDrawing,10);
+  setTimeout(sendDrawing, 10);
 }
 
 sendDrawing();
@@ -56,12 +61,12 @@ var createUI = function (scene) {
   button.setInteractive();
 
 
-  for (var i = 0; i < 12; i++) {
+  for (var i = 0; i < configuration.drawBoardWidth; i++) {
     squares.push([]);
-    for (var u = 0; u < 17; u++) {
-      const img = scene.add.image(30 + u * 51, 100 + i * 51, "whitesquare");
-      img.tagX = u;
-      img.tagY = i;
+    for (var u = 0; u < configuration.drawBoardHeight; u++) {
+      const img = scene.add.image(offsetX + i * (blockSize + borderSize), offsetY + u * (blockSize + borderSize), "whitesquare");
+      img.tagX = i;
+      img.tagY = u;
       img.setInteractive();
       squares[i].push(img);
 
@@ -70,14 +75,14 @@ var createUI = function (scene) {
 
   scene.input.on('gameobjectdown', (pointer, gameObject) => {
     if (gameObject === button) {
-      squares.forEach(row=> {row.forEach(s=> s.setTexture('whitesquare'))});
+      squares.forEach(row => { row.forEach(s => s.setTexture('whitesquare')) });
       actionLog = [];
       fetch(serverUrl + 'event', {
         method: 'post',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ action: 'clear-img'})
+        body: JSON.stringify({ action: 'clear-img' })
       });
     }
     else {
