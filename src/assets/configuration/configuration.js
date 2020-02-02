@@ -12,7 +12,9 @@ export default {
         type: Phaser.AUTO,
         parent: 'phaser-app',
         width:1920,
-        height: 1080,
+        height:1080,
+        // width:1280,
+        // height:720,
         pixelArt: true,
     }
 };

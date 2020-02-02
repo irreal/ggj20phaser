@@ -20,11 +20,12 @@ const game = new Phaser.Game(phaserConfig);
 var squares = [];
 var currentMode = '';
 var actionLog = [];
+var previousActionLogs = [];
 var lastTimestamp = new Date().getTime();
 const blockSize = 30;
 const borderSize = 0;
 const offsetX = 170;
-const offsetY = 50;
+const offsetY = 20;
 
 console.log('Running GGJ20 Phaser frontend version: ', VERSION);
 
@@ -62,21 +63,10 @@ var createUI = function (scene) {
   var canvas = scene.game.canvas;
   scene.cameras.main.setBackgroundColor('#FFFFFF')
 
-  const background = scene.add.image((canvas.width /2) + 10,canvas.height / 2,"background");
+  const background = scene.add.image((canvas.width / 2) + 10, canvas.height / 2, "background");
   background.setScale(1.0);
 
 
-  const message = scene.add.image(canvas.width / 2 - 100, canvas.height,"messageBox");
-  message.setOrigin(0.5,1);
-
-  const button = scene.add.image(1300, 970, "buttonUp");
-  button.setInteractive();
-
-  const messageText = scene.add.text(400, 970, `v: ${VERSION}`, { fontFamily: 'Raleway' });
-  messageText.setOrigin(0,0.5);
-  messageText.setColor('black');
-  messageText.setFontSize(42);
-  messageText.text = "Please draw a shovel";
 
 
 
@@ -92,15 +82,50 @@ var createUI = function (scene) {
     }
   }
 
-  const versionText = scene.add.text(0, 0, `v: ${VERSION}`, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif' });
-  versionText.setColor('black');
+  const message = scene.add.image(canvas.width / 2 - 100, canvas.height, "messageBox");
+  message.setOrigin(0.5, 1);
+
+  const buttonSend = scene.add.image(1600, 970, "buttonSend");
+  buttonSend.setInteractive();
+  buttonSend.setScale(0.7);
+
+  const buttonReset = scene.add.image(1480, 970, "buttonReset");
+  buttonReset.setInteractive();
+  buttonReset.setScale(0.7);
+
+  const buttonUndo = scene.add.image(200, 970, "buttonUndo");
+  buttonUndo.setInteractive();
+  buttonUndo.setScale(0.7);
+
+  const messageText = scene.add.text(400, 970, `v: ${VERSION}`, { fontFamily: 'Raleway' });
+  messageText.setOrigin(0, 0.5);
+  messageText.setColor('black');
+  messageText.setFontSize(42);
+  messageText.text = "Please draw a shovel";
+
+  // const versionText = scene.add.text(0, 0, `v: ${VERSION}`, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif' });
+  // versionText.setColor('black');
 
   scene.input.on('gameobjectdown', (pointer, gameObject) => {
-    if (gameObject === button) {
+    if (gameObject === buttonSend) {
       sendDrawing();
       // clearDrawing();
     }
+    else if (gameObject === buttonReset) {
+     if (actionLog.length) {
+       previousActionLogs.push([...actionLog]);
+      clearDrawing();
+     } 
+    }
+    else if (gameObject === buttonUndo) {
+      if (!previousActionLogs.length) {
+        return;
+      }
+     actionLog = [...previousActionLogs.pop()]; 
+     syncStates();
+    }
     else {
+      previousActionLogs.push([...actionLog]);
       currentMode = gameObject.texture.key == 'emptySquare' ? 'black' : 'white';
       squareClick(gameObject, currentMode, actionLog, lastTimestamp);
       lastTimestamp = new Date().getTime();
@@ -119,7 +144,22 @@ var createUI = function (scene) {
   });
 }
 
+function syncStates() {
+  var template = Array(configuration.drawBoardWidth);
+  for (var i = 0; i < template.length; i++) {
+    template[i] = Array(configuration.drawBoardHeight).fill(0);
+  }
 
+  actionLog.forEach(li=>{
+    template[li.x][li.y] = li.action;
+  });
+
+  for (var x = 0; x < configuration.drawBoardWidth; x++) {
+    for (var y = 0; y <configuration.drawBoardHeight; y++) {
+      squares[x][y].setTexture(template[x][y] == 1 ? 'filledSquare' : 'emptySquare');
+    }
+  }
+}
 
 function resizeApp() {
   console.log('resizing app');
@@ -132,8 +172,8 @@ function resizeApp() {
   var height;
   var width;
   // if (window.innerWidth > window.innerHeight) {
-    height = window.innerHeight + "px";
-    width = Math.round((window.innerHeight * game_ratio)) + "px";
+  height = window.innerHeight + "px";
+  width = Math.round((window.innerHeight * game_ratio)) + "px";
   // }
   // else {
   //   width = window.innerWidth + "px";

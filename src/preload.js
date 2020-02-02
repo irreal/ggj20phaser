@@ -6,8 +6,9 @@ import background from "./assets/bg.png";
 import emptySquare from "./assets/empty.png";
 import filledSquare from "./assets/full.png";
 import messageBox from "./assets/msg.png";
-import buttonUp from "./assets/btnup.png";
-import buttonDown from "./assets/btndwn.png";
+import buttonSend from "./assets/btn_send.png";
+import buttonUndo from "./assets/btn_undo.png";
+import buttonReset from "./assets/btn_reset.png";
 export default function () {
     this.load.image("button", buttonImg);
     this.load.image("blacksquare", blackSquareImg);
@@ -17,6 +18,7 @@ export default function () {
     this.load.image('emptySquare', emptySquare);
     this.load.image('filledSquare', filledSquare)
     this.load.image('messageBox', messageBox)
-    this.load.image('buttonUp', buttonUp)
-    this.load.image('buttonDown',buttonDown)
+    this.load.image('buttonSend', buttonSend)
+    this.load.image('buttonReset', buttonReset)
+    this.load.image('buttonUndo', buttonUndo)
 };
