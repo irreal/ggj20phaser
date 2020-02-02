@@ -46,6 +46,8 @@ function getProgression() {
   }).then(jsonData=>{
     console.log('got some progression', jsonData);
     messageText.setText(jsonData.hint);
+    previousActionLogs.push([...actionLog]);
+    clearDrawing();
   }).catch(()=>{
     console.log('probably timing out, retrying get progression');
   }).finally(()=>{
