@@ -26,6 +26,7 @@ const blockSize = 30;
 const borderSize = 0;
 const offsetX = 170;
 const offsetY = 20;
+var messageText;
 
 console.log('Running GGJ20 Phaser frontend version: ', VERSION);
 
@@ -33,6 +34,23 @@ function create() {
   createUI(this);
   // resizeApp();
   // window.addEventListener('resize', resizeApp);
+  getProgression();
+}
+
+function getProgression() {
+  fetch(serverUrl + 'progression', {
+    method: 'get',
+
+  }).then(data=>{
+    return data.json();
+  }).then(jsonData=>{
+    console.log('got some progression', jsonData);
+    messageText.setText(jsonData.hint);
+  }).catch(()=>{
+    console.log('probably timing out, retrying get progression');
+  }).finally(()=>{
+    setTimeout(getProgression, 1000);
+  });
 }
 
 function sendDrawing() {
@@ -97,11 +115,11 @@ var createUI = function (scene) {
   buttonUndo.setInteractive();
   buttonUndo.setScale(0.7);
 
-  const messageText = scene.add.text(400, 970, `v: ${VERSION}`, { fontFamily: 'Raleway' });
+  messageText = scene.add.text(400, 970, `v: ${VERSION}`, { fontFamily: 'Raleway' });
   messageText.setOrigin(0, 0.5);
   messageText.setColor('black');
   messageText.setFontSize(42);
-  messageText.text = "Please draw a shovel";
+  messageText.text = "";
 
   // const versionText = scene.add.text(0, 0, `v: ${VERSION}`, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif' });
   // versionText.setColor('black');

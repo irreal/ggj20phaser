@@ -1,0 +1,38 @@
+#if DEBUG
+    private const string apiURL = "http://localhost:3000/";
+#else
+    private const string apiURL = "https://ggj20.azurewebsites.net/";
+#endif
+    private int failCount = 0;
+
+    private IEnumerator UploadLevelProgression()
+    {
+        DrawScreenController[] screens = FindObjectsOfType<DrawScreenController>();
+        foreach (DrawScreenController s in screens)
+        {
+            if (s.levelId == currentLevel)
+            {
+                UnityWebRequest request = UnityWebRequest.Post(apiURL + "progression",$"action=progression&level={currentLevel}&hint={s.SecondPlayerDrawingHint}" );
+                //request.SetRequestHeader("Content-Type", "application/json");
+                yield return request.SendWebRequest();
+                if (request.isNetworkError || request.isHttpError)
+                {
+                    Debug.Log(request.error);
+                    failCount++;
+                    if (failCount < 3)
+                    {
+                        yield return new WaitForSeconds(1);
+                        StartCoroutine(UploadLevelProgression());
+                    }
+                    else
+                    {
+                        Debug.LogError("Could not upload progression multiple times. Giving up :(");
+                    }
+                    yield break;
+                }
+                failCount = 0;
+                yield break;
+            }
+        }
+        Debug.LogError("Could not find screen associated with current level! Level id: " + currentLevel);
+    }
